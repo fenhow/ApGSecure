@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -8,9 +9,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = "admin123";
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// Homepage route
+app.get('/', (req, res) => {
+  res.send(\`
+    <html>
+      <head><title>Secure Gateway</title></head>
+      <body style="font-family: Arial; text-align: center; padding: 50px;">
+        <h2>🔒 Secure Login Gateway</h2>
+        <p>This endpoint is designed to protect links behind a login page.</p>
+        <p>To access, use the embedded form on the main website or <a href="/admin">go to the admin panel</a>.</p>
+      </body>
+    </html>
+  \`);
+});
 
 // Load users from JSON file
 function loadUsers() {
@@ -45,12 +61,12 @@ app.get('/redirect/:token', (req, res) => {
 
   if (record && !record.used) {
     record.used = true;
-    return res.send(`
+    return res.send(\`
       <html>
-        <head><meta http-equiv="refresh" content="0;url=${record.url}"></head>
+        <head><meta http-equiv="refresh" content="0;url=\${record.url}"></head>
         <body><p>Redirecting...</p></body>
       </html>
-    `);
+    \`);
   }
 
   res.send("<h3>Invalid or expired link.</h3>");
