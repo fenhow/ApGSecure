@@ -13,6 +13,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'admin.html'));
+});
 
 // Homepage route
 app.get('/', (req, res) => {
