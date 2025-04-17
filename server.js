@@ -16,7 +16,7 @@ app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // Homepage route
 app.get('/', (req, res) => {
-  res.send(\`
+  res.send(`
     <html>
       <head><title>Secure Gateway</title></head>
       <body style="font-family: Arial; text-align: center; padding: 50px;">
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
         <p>To access, use the embedded form on the main website or <a href="/admin">go to the admin panel</a>.</p>
       </body>
     </html>
-  \`);
+  `);
 });
 
 // Load users from JSON file
@@ -61,12 +61,12 @@ app.get('/redirect/:token', (req, res) => {
 
   if (record && !record.used) {
     record.used = true;
-    return res.send(\`
+    return res.send(`
       <html>
-        <head><meta http-equiv="refresh" content="0;url=\${record.url}"></head>
+        <head><meta http-equiv="refresh" content="0;url=${record.url}"></head>
         <body><p>Redirecting...</p></body>
       </html>
-    \`);
+    `);
   }
 
   res.send("<h3>Invalid or expired link.</h3>");
