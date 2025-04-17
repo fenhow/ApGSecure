@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 2em; }
+    input, button { margin: 0.5em 0; padding: 0.5em; width: 100%; }
+    .user { display: flex; justify-content: space-between; margin: 0.5em 0; }
+    .user span { flex: 1; }
+  </style>
+</head>
+<body>
+  <h2>Admin Login</h2>
+  <div id="loginBox">
+    <input type="password" id="adminPass" placeholder="Enter Admin Password" />
+    <button onclick="adminLogin()">Login</button>
+  </div>
+
+  <div id="adminPanel" style="display:none;">
+    <h3>Add New User</h3>
+    <input type="text" id="newUsername" placeholder="Username" />
+    <input type="password" id="newPassword" placeholder="Password" />
+    <input type="url" id="newURL" placeholder="Redirect URL" />
+    <button onclick="addUser()">Add User</button>
+
+    <h3>Current Users</h3>
+    <div id="userList"></div>
+  </div>
+
+  <script>
+    let token = "";
+
+    async function adminLogin() {
+      const pass = document.getElementById("adminPass").value;
+      const res = await fetch('/admin/login', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pass })
+      });
+      const data = await res.json();
+      if (data.success) {
+        token = data.token;
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        loadUsers();
+      } else {
+        alert("Wrong password");
+      }
+    }
+
+    async function loadUsers() {
+      const res = await fetch('/admin/users?token=' + token);
+      const users = await res.json();
+      const list = document.getElementById("userList");
+      list.innerHTML = "";
+      for (let name in users) {
+        const div = document.createElement("div");
+        div.className = "user";
+        div.innerHTML = `<span>${name}</span>
+          <button onclick="deleteUser('${name}')">❌ Delete</button>`;
+        list.appendChild(div);
+      }
+    }
+
+    async function addUser() {
+      const username = document.getElementById("newUsername").value;
+      const password = document.getElementById("newPassword").value;
+      const url = document.getElementById("newURL").value;
+
+      const res = await fetch('/admin/users?token=' + token, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, url })
+      });
+      const result = await res.json();
+      if (result.success) {
+        loadUsers();
+      } else {
+        alert("Error adding user.");
+      }
+    }
+
+    async function deleteUser(username) {
+      const res = await fetch('/admin/users?token=' + token + '&username=' + username, {
+        method: 'DELETE'
+      });
+      const result = await res.json();
+      if (result.success) {
+        loadUsers();
+      } else {
+        alert("Error deleting user.");
+      }
+    }
+  </script>
+</body>
+</html>
