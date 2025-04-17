@@ -1,0 +1,10 @@
+{
+  "fenwick": {
+    "password": "supersecure",
+    "url": "https://example.com/secret-page"
+  },
+  "sandra": {
+    "password": "goldenkey",
+    "url": "https://example.com/another-page"
+  }
+}
